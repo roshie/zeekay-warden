@@ -1,6 +1,6 @@
 "use client";
 
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ConnectButton } from "@/components/util/ConnectButton";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import Image from "next/image";
 
