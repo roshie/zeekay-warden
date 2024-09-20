@@ -23,6 +23,11 @@ contract ZeekayWarden {
         s_plonkVerifierAddress = plonkVerifierAddress;
     }
 
+    function getUserRoles(string memory serverId) public view returns (string[] memory) {
+        require(bytes(members[msg.sender][serverId].platformUID).length > 0, "User not found");
+        return members[msg.sender][serverId].roles;
+    }
+
     // ZK proof is generated in the browser and submitted as a transaction w/ the proof as bytes.
     function submitProofAndAddUser(bytes memory proof, uint256[] memory pubSignals, string[] memory data, string[] memory roles) public returns (bool) {
         bool result = IPlonkVerifier(s_plonkVerifierAddress).verifyProof(proof, pubSignals);
@@ -41,6 +46,12 @@ contract ZeekayWarden {
         string memory platformUID = data[1];
         Membership memory member = Membership({platformUID: platformUID, roles: roles});
         members[user][serverId] = member;
+    }
+
+    // Call this function before assigning roles. 
+    function checkUser(string memory platformUID, string memory serverId) public view returns (bool) {
+        string memory _puid = members[msg.sender][serverId].platformUID;
+        return keccak256(abi.encodePacked(_puid)) == keccak256(abi.encodePacked(platformUID));
     }
 
 
