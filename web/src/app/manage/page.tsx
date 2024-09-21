@@ -77,7 +77,7 @@ const GuildsComponent: React.FC = () => {
                 method: 'GET',
                 headers: {
                     'accept': 'application/json',
-                    'x-api-key': '2b75124cf005494e926dcd68ea99f602'
+                    'x-api-key': `${process.env.OPENSEA_API_KEY}`,
                 }
             });
 
@@ -200,13 +200,24 @@ const GuildsComponent: React.FC = () => {
                                                                     </button>
                                                                 </>
                                                             ) : (
-                                                                <div className="w-full">
+                                                                <div className="w-full relative">
                                                                     <input
                                                                         type="text"
                                                                         className={`w-full px-2 py-1 border rounded ${role.borderColor ? `border-2 focus:border-${role.borderColor}-500` : ''}`}
-                                                                        placeholder={role.action === 'check_token' ? "0xabcdefgh" : "Enter OpenSea NFT Collection Name"}
+                                                                        placeholder={role.action === 'check_token' ? "0xabcdefgh,10,AMB" : "Enter OpenSea NFT Collection Name"}
                                                                         value={role.data ?? ''}
                                                                         onChange={(e) => handleInputChange(guild.guildId, role.roleId, e.target.value, 'data')}
+                                                                        onFocus={(e) => {
+                                                                            if (role.action === 'check_token') {
+                                                                                const tooltip = document.createElement('div');
+                                                                                tooltip.className = 'absolute bg-gray-700 text-white text-xs rounded py-1 px-2 right-0 top-0 transform -translate-y-full mt-1';
+                                                                                tooltip.innerText = 'Add address and the quantity and Symbol as comma separated values';
+                                                                                e.target.parentElement?.appendChild(tooltip);
+                                                                                e.target.onblur = () => {
+                                                                                    tooltip.remove();
+                                                                                };
+                                                                            }
+                                                                        }}
                                                                     />
                                                                     {role.imageUrl && (
                                                                         <img src={role.imageUrl} alt="NFT" className="mt-2 w-16 h-16" />
