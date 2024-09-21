@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 // Interface to PlonkVerifier.sol
 interface IPlonkVerifier {
@@ -197,6 +198,11 @@ contract ZeekayWarden is ERC721, ERC721URIStorage, Ownable {
     function char(bytes1 b) internal pure returns (bytes1 c) {
         if (uint8(b) < 10) return bytes1(uint8(b) + 0x30);
         else return bytes1(uint8(b) + 0x57);
+    }
+
+    function getTokenBalance(address token_address) public view returns (uint256) {
+        uint256 tokenbalance = IERC20(token_address).balanceOf(address(this));
+        return tokenbalance;
     }
 
 }   

@@ -13,7 +13,7 @@ const { vars } = require("hardhat/config");
 // To export your private key from Metamask, open Metamask and
 // go to Account Details > Export Private Key
 // Beware: NEVER put real Ether into testing accounts
-// const SEPOLIA_PRIVATE_KEY = vars.get("SEPOLIA_PRIVATE_KEY");
+const MORPH_PRIVATE_KEY = vars.get("MORPH_PRIVATE_KEY");
 
 // airdao
 module.exports = {
@@ -33,7 +33,7 @@ module.exports = {
     morph: {
       url: "https://rpc-quicknode-holesky.morphl2.io/",
       chainId: 2810,
-      accounts: [process.env.MORPH_PRIVATE_KEY],
+      accounts: [MORPH_PRIVATE_KEY],
     }
   },
   paths: {
