@@ -17,15 +17,37 @@ import {
 } from 'wagmi';
 
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import { http } from 'viem';  
-import { mainnet } from 'viem/chains';
+import { http, createClient } from 'viem';  
+import { sepolia } from 'viem/chains';
+import { getOrMapViemChain } from "@dynamic-labs/ethereum-core";
+
+
 const queryClient = new QueryClient();
 
+const customEvmNetworks = [
+  {
+    blockExplorerUrls: ["https://explorer-holesky.morphl2.io/"],
+    chainId: 2810,
+    name: "Morph",
+    rpcUrls: ["https://rpc-quicknode-holesky.morphl2.io"],
+    iconUrls: ["https://avatars.githubusercontent.com/u/132543920?v=4"],
+    nativeCurrency: {
+      name: "Ethereum",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    networkId: 2810,
+  },
+];
+
 const config = createConfig({
-  chains: [mainnet],
+  chains: [sepolia, ...customEvmNetworks.map(getOrMapViemChain)],
   multiInjectedProviderDiscovery: false,
-  transports: {
-    [mainnet.id]: http(),
+  client({ chain }) {
+    return createClient({
+      chain,
+      transport: http(),
+    });
   },
 });
 
