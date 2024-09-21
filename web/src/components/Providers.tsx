@@ -77,7 +77,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       settings={{
         environmentId: process.env.DYNAMIC_ENV_ID || "088e4772-f833-4aea-97d0-e05455ab03ba",
         walletConnectors: [EthereumWalletConnectors],
-        overrides: { evmNetworks }
+        overrides: { evmNetworks },
+        initialAuthenticationMode: 'connect-only',
       }}
     >
       <WagmiProvider config={config}>

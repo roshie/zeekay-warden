@@ -1,18 +1,26 @@
 "use client";
 
-import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
+import { DynamicWidget, useDynamicContext, useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import Image from "next/image";
+import { useEffect } from "react";
+import { useAccount } from "wagmi";
+
 
 
 export default function Layout({
     children,
 }: Readonly<{
     children: React.ReactNode;
-}>) {
+}>) {  
+
+    const { setShowAuthFlow, sdkHasLoaded } = useDynamicContext();
+    const isLoggedIn = useIsLoggedIn();
+    const account = useAccount()
+
     return <main className="container flex min-h-screen flex-col items-center justify-center p-10">
         <div className="absolute top-5 right-12 mr-5">
-            <DynamicWidget variant="modal" />
+            <DynamicWidget variant="modal" innerButtonComponent={<button>Connect Wallet</button>} />
         </div>
         <div className="absolute top-5 right-5">
             <ModeToggle />
