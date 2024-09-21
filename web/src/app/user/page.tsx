@@ -19,7 +19,10 @@ const UserPage = () => {
 
     const authenticateDiscord = async () => {
         try{
-            window.location.href = 'https://discord.com/oauth2/authorize?client_id=1284144283309314048&permissions=268435456&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fdiscord%2Fcallback&scope=identify+guilds+guilds.members.read+bot';
+            const client_id = process.env.CLIENT_ID;  // Replace with your Discord client ID
+            const client_secret = process.env.CLIENT_SECRET; 
+            const redirect_uri = 'http://localhost:3000/api' // Replace with your Discord client secret
+            window.location.href = `https://discord.com/oauth2/authorize?client_id=${client_id}&permissions=268435456&response_type=code&redirect_uri=${encodeURIComponent(redirect_uri)}&scope=identify+guilds+guilds.members.read+bot`;
         } catch(error){
             console.error('Error Redirecting to Discord:', error);
         }

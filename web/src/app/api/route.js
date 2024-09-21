@@ -1,11 +1,23 @@
 import axios from 'axios';
 import qs from 'qs';
+// export async function GET(req) {
+//     const { searchParams } = new URL(req.url);
+//   const code = searchParams.get('code');
+//     // Respond with "Hello World" when this endpoint is touched
+//     return new Response(`Hello World: ${code}`, { status: 200 });
+//   }
+  
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get('code');
   
+//   if (code){
+//     return new Response(`Hello World the code is ${code}, client_id: ${process.env.CLIENT_ID}, client_secret: ${process.env.CLIENT_SECRET}`, { status: 200 });
+//   }
+
   if (!code) {
+    console.log('hit')
     return new Response('Authorization code not provided', { status: 400 });
   }
 
