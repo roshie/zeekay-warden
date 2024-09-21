@@ -1,8 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
-import GuildCard from '@/components/guildcard';
-import { NextResponse } from 'next/server';
+import { Toaster, toast } from 'react-hot-toast';
 
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { app } from '.././../../firebaseconfig';
@@ -10,14 +8,15 @@ import { app } from '.././../../firebaseconfig';
 interface Guild {
     guildId: string;
     guildName: string;
-    roles: { roleId: string; roleName: string; tokenAddress?: string }[];
+    roles: { roleId: string; roleName: string; data?: string; action?: string; imageUrl?: string; borderColor?: string }[];
     showRoles?: boolean;
 }
 
 const GuildsComponent: React.FC = () => {
     const [guilds, setGuilds] = useState<Guild[]>([]);
     const [error, setError] = useState<string | null>(null);
-    const [buttonClicked, setButtonClicked] = useState(false);
+    const [buttonClicked, setButtonClicked] = useState<boolean>(false);
+    const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -49,12 +48,59 @@ const GuildsComponent: React.FC = () => {
         fetchData();
     }, []);
 
-    const handleInputChange = (guildId: string, roleId: string, value: string) => {
+    const handleInputChange = (guildId: string, roleId: string, value: string, field: string) => {
         const updatedGuilds = guilds.map(guild => {
             if (guild.guildId === guildId) {
                 const updatedRoles = guild.roles.map(role => {
                     if (role.roleId === roleId) {
-                        return { ...role, tokenAddress: value };
+                        return { ...role, [field]: value };
+                    }
+                    return role;
+                });
+                return { ...guild, roles: updatedRoles };
+            }
+            return guild;
+        });
+        setGuilds(updatedGuilds);
+
+        if (field === 'data' && value && updatedGuilds.find(g => g.guildId === guildId)?.roles.find(r => r.roleId === roleId)?.action === 'check_nft') {
+            if (typingTimeout) {
+                clearTimeout(typingTimeout);
+            }
+            setTypingTimeout(setTimeout(() => fetchNFTData(guildId, roleId, value), 5000));
+        }
+    };
+
+    const fetchNFTData = async (guildId: string, roleId: string, collectionSlug: string) => {
+        try {
+            const response = await fetch(`https://api.opensea.io/api/v2/collections/${collectionSlug}`, {
+                method: 'GET',
+                headers: {
+                    'accept': 'application/json',
+                    'x-api-key': `${process.env.OPENSEA_API_KEY}`,
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const imageUrl = data.image_url;
+                updateRoleData(guildId, roleId, imageUrl, 'green');
+                toast.success('It is a real NFT!');
+            } else {
+                throw new Error('Failed to fetch NFT data');
+            }
+        } catch (error) {
+            updateRoleData(guildId, roleId, '', 'red');
+            toast.error('Enter proper NFT collection name');
+        }
+    };
+
+    const updateRoleData = (guildId: string, roleId: string, imageUrl: string, borderColor: string) => {
+        const updatedGuilds = guilds.map(guild => {
+            if (guild.guildId === guildId) {
+                const updatedRoles = guild.roles.map(role => {
+                    if (role.roleId === roleId) {
+                        return { ...role, imageUrl, borderColor };
                     }
                     return role;
                 });
@@ -66,16 +112,22 @@ const GuildsComponent: React.FC = () => {
     };
 
     const handleSubmit = () => {
-        const rolesWithTokenAddresses = guilds.flatMap(guild =>
-            guild.roles.map(role => ({
-                guildName: guild.guildName,
+        const updatedData = guilds.map(guild => ({
+            guildName: guild.guildName,
+            roles: guild.roles.map(role => ({
                 roleName: role.roleName,
-                tokenAddress: role.tokenAddress || ''
+                action: role.action || 'check_nft',
+                data: role.data || ''
             }))
-        );
-        console.log('Roles with token addresses:', rolesWithTokenAddresses);
+        }));
+        console.log('Updated guild data:', updatedData);
         setButtonClicked(true);
         setTimeout(() => setButtonClicked(false), 200); // Reset color effect after 200ms
+    };
+
+    const handleMint = () => {
+        console.log('Mint button clicked');
+        // Placeholder function for minting
     };
 
     return (
@@ -110,7 +162,8 @@ const GuildsComponent: React.FC = () => {
                                         <thead>
                                             <tr>
                                                 <th className="py-2">Role Name</th>
-                                                <th className="py-2">Token Address</th>
+                                                <th className="py-2">Action</th>
+                                                <th className="py-2">Details</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -120,12 +173,57 @@ const GuildsComponent: React.FC = () => {
                                                     <tr key={role.roleId}>
                                                         <td className="border px-4 py-2">{roleName}</td>
                                                         <td className="border px-4 py-2">
-                                                            <input
-                                                                type="text"
+                                                            <select
                                                                 className="w-full px-2 py-1 border rounded"
-                                                                value={role.tokenAddress || ''}
-                                                                onChange={(e) => handleInputChange(guild.guildId, role.roleId, e.target.value)}
-                                                            />
+                                                                value={role.action || ''}
+                                                                onChange={(e) => handleInputChange(guild.guildId, role.roleId, e.target.value, 'action')}
+                                                            >
+                                                                <option value="check_nft">Check NFT</option>
+                                                                <option value="check_token">Check Token</option>
+                                                                <option value="airdrop">Airdrop</option>
+                                                            </select>
+                                                        </td>
+                                                        <td className="border justify-between px-4 py-2 flex items-center">
+                                                            {role.action === 'airdrop' ? (
+                                                                <>
+                                                                    <textarea
+                                                                        className="w-full px-2 py-1 border rounded"
+                                                                        placeholder="CSV values"
+                                                                        value={role.data ?? ''}
+                                                                        onChange={(e) => handleInputChange(guild.guildId, role.roleId, e.target.value, 'data')}
+                                                                    ></textarea>
+                                                                    <button
+                                                                        className="bg-green-500 text-white px-4 py-4 rounded ml-4 mr-2"
+                                                                        onClick={handleMint}
+                                                                    >
+                                                                        Mint
+                                                                    </button>
+                                                                </>
+                                                            ) : (
+                                                                <div className="w-full relative">
+                                                                    <input
+                                                                        type="text"
+                                                                        className={`w-full px-2 py-1 border rounded ${role.borderColor ? `border-2 focus:border-${role.borderColor}-500` : ''}`}
+                                                                        placeholder={role.action === 'check_token' ? "0xabcdefgh,10,AMB" : "Enter OpenSea NFT Collection Name"}
+                                                                        value={role.data ?? ''}
+                                                                        onChange={(e) => handleInputChange(guild.guildId, role.roleId, e.target.value, 'data')}
+                                                                        onFocus={(e) => {
+                                                                            if (role.action === 'check_token') {
+                                                                                const tooltip = document.createElement('div');
+                                                                                tooltip.className = 'absolute bg-gray-700 text-white text-xs rounded py-1 px-2 right-0 top-0 transform -translate-y-full mt-1';
+                                                                                tooltip.innerText = 'Add address and the quantity and Symbol as comma separated values';
+                                                                                e.target.parentElement?.appendChild(tooltip);
+                                                                                e.target.onblur = () => {
+                                                                                    tooltip.remove();
+                                                                                };
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                    {role.imageUrl && (
+                                                                        <img src={role.imageUrl} alt="NFT" className="mt-2 w-16 h-16" />
+                                                                    )}
+                                                                </div>
+                                                            )}
                                                         </td>
                                                     </tr>
                                                 );
@@ -137,11 +235,11 @@ const GuildsComponent: React.FC = () => {
                         </div>
                     ))
                 ) : (
-                    <p>No guilds found</p>
+                    <p> Loading... </p>
                 )}
             </div>
             <button
-                className={`bg-blue-500 text-white px-4 py-2 rounded mt-4 ${buttonClicked ? 'bg-green-300' : ''}`}
+                className={`bg-green-500 text-white px-4 py-2 rounded mt-4`}
                 onClick={handleSubmit}
             >
                 Submit

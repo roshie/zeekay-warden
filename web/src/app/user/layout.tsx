@@ -9,9 +9,7 @@ const UserLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <h1>User Page</h1>
             </header>
             <main>{children}</main>
-            <footer>
-                <p>© 2023 Your Company</p>
-            </footer>
+
         </div>
     );
 };
