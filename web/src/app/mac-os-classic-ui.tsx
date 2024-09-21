@@ -1,10 +1,13 @@
+import { useEffect, useRef } from 'react';
+import $ from 'jquery';
+import 'jquery-ui/ui/widgets/draggable';
 import 'jquery-ui/ui/widgets/resizable';
 import './style.css';
-import { useConnectModal } from '@rainbow-me/rainbowkit';
+import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 
 const MacOSClassicUI = () => {
   const screenRef = useRef<HTMLDivElement>(null);
-  const { openConnectModal } = useConnectModal();
+  const { handleLogIn } = useDynamicContext();
 
   useEffect(() => {
     if (screenRef.current) {
@@ -54,8 +57,8 @@ const MacOSClassicUI = () => {
           $(this).on('click dblclick', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            if (openConnectModal) {
-              openConnectModal();
+            if (handleLogIn) {
+              handleLogIn();
             }
           });
         }
@@ -65,8 +68,8 @@ const MacOSClassicUI = () => {
       $("#system").on('click dblclick', function (e) {
         e.preventDefault();
         e.stopPropagation();
-        if (openConnectModal) {
-          openConnectModal();
+        if (handleLogIn) {
+          handleLogIn();
         }
       });
 
@@ -98,7 +101,7 @@ const MacOSClassicUI = () => {
         $(this).parent("header").parent(".window").fadeOut(300);
       });
     }
-  }, [openConnectModal]);
+  }, [handleLogIn]);
 
   return (
     <div className="screen" ref={screenRef}>
