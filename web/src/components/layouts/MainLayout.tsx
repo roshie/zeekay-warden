@@ -17,7 +17,7 @@ export default function Layout({
         <div className="absolute top-5 right-5">
             <ModeToggle />
         </div>
-        <div className="absolute top-5 left-5 flex flex-row items-center bg-zinc-900 rounded-md p-2">
+        {/* <div className="absolute top-5 left-5 flex flex-row items-center bg-zinc-900 rounded-md p-2">
             <Image
                 className="relative rounded-md"
                 src="/logo.gif"
@@ -30,7 +30,7 @@ export default function Layout({
                 <div className="text-3xl font-bold">some app</div>
                 <div className="text-lg ">this app does something</div>
             </div>
-        </div>
+        </div> */}
 
         <section className="lg:max-w-5xl lg:w-full">
             <div className="ring-1 ring-zinc-700 rounded-xl p-8 w-full">
