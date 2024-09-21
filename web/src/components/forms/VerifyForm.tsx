@@ -19,14 +19,19 @@ interface FormProps {
 }
 
 
-export function VerifyForm({communitySlug, roles: abc}: FormProps) {
+export function VerifyForm({communitySlug, roles}: FormProps) {
     const [checked, setChecked] = React.useState<any>({});
 
-    const roles = [
-        ["Role1", "NFT", "base/0xbe3c7abab76f0a1de602fdb2f44faf604a5f649f"],
-        ["Role2", "ERC20", "AMB/20"],
-        ["Role3", "MEMBER", "22-50"]
-    ]
+    // const roles = [
+    //     ["Role1", "NFT", "base/0xbe3c7abab76f0a1de602fdb2f44faf604a5f649f"],
+    //     ["Role2", "ERC20", "AMB/20"],
+    //     ["Role3", "MEMBER", "22-50"]
+    // ]
+
+    const validateAndGenerateProof = (e: any) => {
+
+    }
+
   return (
     <Card className="w-[650px]">
       <CardHeader>
@@ -47,7 +52,7 @@ export function VerifyForm({communitySlug, roles: abc}: FormProps) {
                             message = <p> Do you hold an NFT in this <a href={opensea_url} style={{textDecoration: "underline"}}>Collection</a>?</p>
                             
                         } else if (tokenType === "ERC20") {
-                            const [symbol, quantity] = role[2].split("/");
+                            const [symbol, address, quantity] = role[2].split("/");
                             message = <p>Do you hold a minimum of {quantity} {symbol} in your wallet?</p>
 
                         } else if (tokenType === "MEMBER") {
@@ -62,30 +67,11 @@ export function VerifyForm({communitySlug, roles: abc}: FormProps) {
                         })}
                 </TableBody>
             </Table>
-
-            {/* <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" placeholder="Name of your project" />
-            </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="framework">Framework</Label>
-              <Select>
-                <SelectTrigger id="framework">
-                  <SelectValue placeholder="Select" />
-                </SelectTrigger>
-                <SelectContent position="popper">
-                  <SelectItem value="next">Next.js</SelectItem>
-                  <SelectItem value="sveltekit">SvelteKit</SelectItem>
-                  <SelectItem value="astro">Astro</SelectItem>
-                  <SelectItem value="nuxt">Nuxt.js</SelectItem>
-                </SelectContent>
-              </Select>
-            </div> */}
           </div>
         </form>
       </CardContent>
       <CardFooter className="flex justify-end">
-        <Button>Generate zKProof</Button>
+        <Button onClick={validateAndGenerateProof}>Generate zKProof</Button>
       </CardFooter>
     </Card>
   )
