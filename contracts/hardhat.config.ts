@@ -25,11 +25,16 @@ module.exports = {
     //   url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,
     //   accounts: [SEPOLIA_PRIVATE_KEY],
     // },
-    airdao: {
-      url: `https://network.ambrosus-test.io/`,
-      accounts: [process.env.AIRDAO_PRIVATE_KEY], 
-      chainId: 22040, 
-    },
+    // airdao: {
+    //   url: `https://network.ambrosus-test.io/`,
+    //   accounts: [process.env.AIRDAO_PRIVATE_KEY], 
+    //   chainId: 22040, 
+    // },
+    morph: {
+      url: "https://rpc-quicknode-holesky.morphl2.io/",
+      chainId: 2810,
+      accounts: [process.env.MORPH_PRIVATE_KEY],
+    }
   },
   paths: {
     sources: "./src"
