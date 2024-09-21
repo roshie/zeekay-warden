@@ -76,6 +76,7 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <DynamicContextProvider
+      theme='dark'
       settings={{
         environmentId: process.env.DYNAMIC_ENV_ID || "088e4772-f833-4aea-97d0-e05455ab03ba",
         walletConnectors: [EthereumWalletConnectors],

@@ -11,8 +11,7 @@ import axios from 'axios';
 import { VerifyForm } from "@/components/forms/VerifyForm";
 
 interface QueryData {
-  serverId : string;
-  userId : string | null;
+  guildId : string;
   userName : string;
 }
 
@@ -20,11 +19,11 @@ export default function Home() {
   const isLoggedIn = useIsLoggedIn();
   const { address } = useAccount();
   const searchParams = useSearchParams();
-  const params = useParams<{ serverId: string }>();
+  const params = useParams<{ guildId: string }>();
   
   const [queryData, setQueryData] = useState<QueryData | null>(null);
-  const [serverRoles, setServerRoles] = useState<string[]>([]);
-  const [wardenSlug, setWardenSlug] = useState<string[]>([]);
+  const [serverRoles, setServerRoles] = useState<string[][]>([]);
+  const [communitySlug, setCommunitySlug] = useState<string | undefined>(undefined);
 
   const [loadedCount, setLoadedCount] = useState(0);
   const [verificationState, setVerificationState] = useState(false);
@@ -36,7 +35,7 @@ export default function Home() {
     abi,
     address: `0x${contractAddresses[chainid]}`,
     functionName: 'getRolesofServer',
-    args: [params.serverId]
+    args: [params.guildId]
   })
 
   // Step 2: Check whether the user has already been verified for this server
@@ -44,39 +43,39 @@ export default function Home() {
     abi,
     address: `0x${contractAddresses[chainid]}`,
     functionName: 'getUserRoles',
-    args: [params.serverId]
+    args: [params.guildId]
   })
 
 
   // Listen to those hooks, and set values to state variables
   useEffect(() => {
-      console.log("getUserRoles", userRolesData, isUserRolesPending, userRolesError)
+      // console.log("getUserRoles", userRolesData, isUserRolesPending, userRolesError)
       if (!isUserRolesPending && userRolesData && !userRolesError) {
-        AssignRoles(address?.toString() ?? "", queryData?.userId ?? "", params.serverId);
+        AssignRoles(address?.toString() ?? "", queryData?.userName ?? "", params.guildId);
       }
       setLoadedCount(loadedCount + 1);
-  }, [userRolesData, isUserRolesPending, userRolesError])
+  }, [isUserRolesPending])
 
   useEffect(() => {
-    console.log("getRolesOfServer", serverRolesData, isServerRolesPending, serverRolesError)
+    // console.log("getRolesOfServer", serverRolesData, isServerRolesPending, serverRolesError)
     if (!isServerRolesPending && serverRolesData && !serverRolesError) {
-      // const {WardenSlug, roles} = serverRolesData
+      console.log(serverRolesData)
+      // const {communitySlug, roles} = serverRolesData
       // setServerRoles(roles)
-      // setWardenSlug(WardenSlug)
+      // setCommunitySlug(communitySlug)
     }
     setLoadedCount(loadedCount + 1);
-}, [serverRolesData, isServerRolesPending, serverRolesError])
+}, [isServerRolesPending])
 
 
   useEffect(() => {
 
     let data: QueryData = {
-      serverId: params.serverId,
-      userId: searchParams.get("userId"),
+      guildId: params.guildId,
       userName: searchParams.get("userName") ?? "Unknown",
     }
     
-    if (data.userId === null || data.serverId === null) {
+    if (data.userName === null || data.guildId === null) {
       redirect("/error/invalid-verify-url");
     } 
 
@@ -98,8 +97,8 @@ export default function Home() {
 
   return (
     <MainLayout>
-      <div className="text-center text-2xl">
-        {loadedCount !== 2 ? 
+      <div className=" text-2xl">
+        {loadedCount < 2 ? 
           <div>Loading...</div>
         :
             isLoggedIn ? 
@@ -110,12 +109,7 @@ export default function Home() {
                   <p>You can now close this window.</p>
                 </div> 
                 :
-              <div>
-
-                <h4>Verify your account</h4>
-                <p>By verifying your account, you will be able to use the {wardenSlug} server.</p>
-                <VerifyForm roles={serverRoles} wardenSlug={wardenSlug}/>
-              </div> 
+                <VerifyForm roles={serverRoles} communitySlug={communitySlug}/>
             : 
             <div>{`Hello ${queryData?.userName}`}! Connect your wallet to get started</div>
         }

@@ -41,9 +41,9 @@ export default function Layout({
         </div> */}
 
         <section className="lg:max-w-5xl lg:w-full">
-            <div className="ring-1 ring-zinc-700 rounded-xl p-8 w-full">
+            <div className="p-8 w-full">
                 <div className="flex justify-center items-start flex-col">
-                    <div className="flex justify-center items-between flex-col w-full">
+                    <div className="flex justify-center items-center flex-col w-full">
                         {children}
                     </div>
                 </div>
