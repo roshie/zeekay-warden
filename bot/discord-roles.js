@@ -4,7 +4,7 @@ const qs = require('qs');
 require('dotenv').config({ path: '.env.local' });  // For storing client ID, client secret, and other sensitive data
 
 const app = express();
-const PORT = 3000;
+const PORT = 3002;
 
 // Environment variables (put these in a .env file)
 const client_id = process.env.CLIENT_ID;        // Discord client ID
