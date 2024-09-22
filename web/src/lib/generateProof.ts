@@ -1,19 +1,21 @@
 
-import path from "path";
+const path = require("path");
 // @ts-ignore
-import * as snarkjs from 'snarkjs';
+const snarkjs = require('snarkjs');
 
-export const generateProof = async (input0: number, input1: number): Promise<any> => {
-  console.log(`Generating vote proof with inputs: ${input0}, ${input1}`);
+export const generateProof = async (input0: number[], input1: number, input2: number): Promise<any> => {
+  console.log(`Generating vote proof with inputs: ${input0}, ${input1}, ${input2}`);
   
   // We need to have the naming scheme and shape of the inputs match the .circom file
   const inputs = {
-    in: [input0, input1],
+    token_owners: input0,
+    wallet_hash: input1,
+    num_roles: input2
   }
 
   // Paths to the .wasm file and proving key
-  const wasmPath = path.join(process.cwd(), '../circuits/check_ownership.wasm');
-  const provingKeyPath = path.join(process.cwd(), '../circuits/proving_key.zkey')
+  const wasmPath = path.join(process.cwd(), '../circuits/build/check_ownership_js/check_ownership.wasm'); 
+  const provingKeyPath = path.join(process.cwd(), '../circuits/build/proving_key.zkey')
 
   try {
     
@@ -31,6 +33,7 @@ export const generateProof = async (input0: number, input1: number): Promise<any
     }
   } catch (err) {
     console.log(`Error:`, err)
+  
     return {
       proof: "", 
       publicSignals: [],

@@ -111,7 +111,9 @@ export default function Home() {
                 :
                 <VerifyForm roles={serverRoles} communitySlug={communitySlug}/>
             : 
-            <div>{`Hello ${queryData?.userName}`}! Connect your wallet to get started</div>
+            <div className="text-center items-center"><h5>{`Hello ${queryData?.userName}`}!</h5><h2>Connect your wallet to get started</h2>
+            <img width="500" src="/intro.gif" alt="Logo" />
+            </div>
         }
       </div>
     </MainLayout>

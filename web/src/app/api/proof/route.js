@@ -1,31 +1,18 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
 import { generateProof } from '@/lib/generateProof';
 
-export async function POST(request) {
-  try {
-    // Parse the incoming request body as JSON
-    const body = await request.json();
+export async function POST(req) {
+  const body = await req.json();
 
-    // Check if the body exists and contains valid inputs
-    const input0 = parseInt(body.input0);
-    const input1 = parseInt(body.input1);
+  const input0 = body.token_owners;
+  const input1 = parseInt(body.wallet_hash);
+  const input2 = parseInt(body.num_roles);
 
-    if (Number.isNaN(input0) || Number.isNaN(input1)) {
-      return NextResponse.json({ error: "Invalid inputs" }, { status: 403 });
-    }
-
-    // Generate proof using the inputs
-    const proof = await generateProof(input0, input1);
-
-    // Check if proof was generated successfully
-    if (!proof || proof.proof === "") {
-      return NextResponse.json({ error: "Proving failed" }, { status: 403 });
-    }
-
-    // Return the generated proof
-    return NextResponse.json(proof, { status: 200 });
-  } catch (error) {
-    // Handle any other errors
-    return NextResponse.json({ error: "An error occurred" }, { status: 500 });
-  }
+  const proof = await generateProof(input0, input1, input2);
+  
+  return NextResponse.json({ success: true, proof: proof });
+  
 }
+
+
+
